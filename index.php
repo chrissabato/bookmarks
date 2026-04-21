@@ -74,7 +74,7 @@ $title = $activeSet['title'] ?? 'Bookmarks';
                   try {
                       $host = parse_url($norm, PHP_URL_HOST);
                       if ($host) $fav = 'https://www.google.com/s2/favicons?domain=' . urlencode($host) . '&sz=32';
-                  } catch (Throwable) {}
+                  } catch (Throwable $e) {}
               }
             ?>
             <a href="<?= htmlspecialchars($url) ?>"
