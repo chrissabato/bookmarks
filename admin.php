@@ -377,6 +377,20 @@ function buildBookmarkRow(bm, cat) {
 }
 
 // ── Icon cell ─────────────────────────────────────────────────────────────────
+function parseIcon(iconClass) {
+    if (!iconClass) return { name: '', weight: 'regular' };
+    const parts = iconClass.trim().split(/\s+/);
+    const namePart = parts.find(p => p.startsWith('ph-') && !['ph-fill','ph-bold','ph-light','ph-thin','ph-duotone'].includes(p));
+    const name = namePart ? namePart.slice(3) : '';
+    const weight = parts.includes('ph-fill') ? 'fill' : parts.includes('ph-bold') ? 'bold' : 'regular';
+    return { name, weight };
+}
+
+function buildIconClass(name, weight) {
+    if (!name) return '';
+    return (weight === 'regular' ? 'ph' : `ph-${weight}`) + ` ph-${name}`;
+}
+
 function renderIconDisplay(btn, bm) {
     btn.innerHTML = '';
     if (bm.icon) {
@@ -409,27 +423,53 @@ function buildIconCell(bm) {
         e.stopPropagation();
         if (popover) { closePopover(); return; }
 
-        popover = el('div', 'absolute left-0 top-8 z-50 bg-gray-900 border border-gray-600 rounded-lg p-3 shadow-2xl w-64');
+        const { name: currentName, weight: currentWeight } = parseIcon(bm.icon);
+        let selectedWeight = currentWeight;
 
+        popover = el('div', 'absolute left-0 top-8 z-50 bg-gray-900 border border-gray-600 rounded-lg p-3 shadow-2xl w-56');
+
+        // Preview
         const previewRow = el('div', 'flex items-center gap-2 mb-2');
-        const preview = el('i', (bm.icon || '') + ' text-indigo-400 text-base w-5 text-center');
+        const preview = el('i', (bm.icon || '') + ' text-indigo-400 text-lg w-6 text-center');
         const previewLabel = el('span', 'text-xs text-gray-500 truncate');
-        previewLabel.textContent = bm.icon || 'No icon set';
+        previewLabel.textContent = currentName || 'No icon set';
         previewRow.append(preview, previewLabel);
 
-        const input = el('input', 'w-full bg-gray-800 border border-gray-700 text-gray-200 text-xs rounded px-2 py-1.5 font-mono focus:outline-none focus:border-gray-500 mb-2');
-        input.placeholder = 'e.g. ph ph-camera or ph-fill ph-camera';
-        input.value = bm.icon || '';
+        // Name input
+        const input = el('input', 'w-full bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-2 py-1.5 font-mono focus:outline-none focus:border-gray-500 mb-2');
+        input.placeholder = 'e.g. video-camera';
+        input.value = currentName;
+
+        // Weight buttons
+        const weights = ['regular', 'fill', 'bold'];
+        const weightRow = el('div', 'flex gap-1 mb-2');
+        weights.forEach(w => {
+            const wb = el('button', `flex-1 text-xs rounded py-1 transition-colors border ${w === selectedWeight ? 'bg-white text-black border-white' : 'border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'}`);
+            wb.textContent = w;
+            wb.dataset.weight = w;
+            wb.addEventListener('click', () => {
+                selectedWeight = w;
+                weightRow.querySelectorAll('button').forEach(b => {
+                    const active = b.dataset.weight === w;
+                    b.className = `flex-1 text-xs rounded py-1 transition-colors border ${active ? 'bg-white text-black border-white' : 'border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'}`;
+                });
+                preview.className = buildIconClass(input.value.trim(), selectedWeight) + ' text-indigo-400 text-lg w-6 text-center';
+            });
+            weightRow.appendChild(wb);
+        });
+
         input.addEventListener('input', () => {
-            preview.className = input.value.trim() + ' text-indigo-400 text-base w-5 text-center';
+            const cls = buildIconClass(input.value.trim(), selectedWeight);
+            preview.className = cls + ' text-indigo-400 text-lg w-6 text-center';
             previewLabel.textContent = input.value.trim() || 'No icon set';
         });
 
-        const btnRow = el('div', 'flex gap-1.5 mb-2');
+        // Action buttons
+        const actionRow = el('div', 'flex gap-1.5 mb-2');
         const setBtn = el('button', 'flex-1 bg-white text-black text-xs font-medium rounded px-2 py-1 hover:bg-gray-200 transition-colors');
         setBtn.textContent = 'Set';
         setBtn.addEventListener('click', async () => {
-            const icon = input.value.trim();
+            const icon = buildIconClass(input.value.trim(), selectedWeight);
             await POST('bookmarks.update', { id: bm.id, icon });
             bm.icon = icon;
             renderIconDisplay(btn, bm);
@@ -444,15 +484,14 @@ function buildIconCell(bm) {
             renderIconDisplay(btn, bm);
             closePopover();
         });
-
-        btnRow.append(setBtn, clearBtn);
+        actionRow.append(setBtn, clearBtn);
 
         const link = el('a', 'block text-xs text-gray-600 hover:text-gray-400 transition-colors text-center');
         link.href = 'https://phosphoricons.com';
         link.target = '_blank';
         link.textContent = 'Browse icons ↗';
 
-        popover.append(previewRow, input, btnRow, link);
+        popover.append(previewRow, input, weightRow, actionRow, link);
         wrap.appendChild(popover);
         setTimeout(() => input.focus(), 10);
 
