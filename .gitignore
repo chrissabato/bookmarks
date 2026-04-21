@@ -1,4 +1,9 @@
 bookmarks.db
+bookmarks.migrated.db
 bookmarks.db-shm
 bookmarks.db-wal
 migrate.php
+bookmarks.json
+bearcats/bookmarks.json
+broadcast/bookmarks.json
+stadium/bookmarks.json
