@@ -347,7 +347,7 @@ function buildBookmarkRow(bm, cat) {
     // Icon cell
     const iconCell = buildIconCell(bm);
 
-    const labelInput = el('input', 'w-32 shrink-0 bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded px-2 py-1 focus:outline-none focus:border-slate-500');
+    const labelInput = el('input', 'w-32 shrink-0 bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded px-2 py-1 focus:outline-none focus:border-slate-400 focus:bg-slate-800');
     labelInput.value = bm.label;
     labelInput.placeholder = 'Label';
     labelInput.addEventListener('change', async () => {
@@ -355,7 +355,7 @@ function buildBookmarkRow(bm, cat) {
         bm.label = labelInput.value;
     });
 
-    const urlInput = el('input', 'flex-1 min-w-0 bg-slate-900 border border-slate-700 text-slate-500 text-xs rounded px-2 py-1 font-mono focus:outline-none focus:border-slate-500');
+    const urlInput = el('input', 'flex-1 min-w-0 bg-slate-900 border border-slate-700 text-slate-500 text-xs rounded px-2 py-1 font-mono focus:outline-none focus:border-slate-400 focus:bg-slate-800');
     urlInput.value = bm.url;
     urlInput.placeholder = 'URL';
     urlInput.addEventListener('change', async () => {
@@ -515,10 +515,10 @@ function appendNewBookmarkRow(bmList, cat) {
 
     const fav = el('div', 'w-4 h-4 shrink-0'); // placeholder space
 
-    const labelInput = el('input', 'w-32 shrink-0 bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded px-2 py-1 focus:outline-none focus:border-slate-500');
+    const labelInput = el('input', 'w-32 shrink-0 bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded px-2 py-1 focus:outline-none focus:border-slate-400 focus:bg-slate-800');
     labelInput.placeholder = 'Label';
 
-    const urlInput = el('input', 'flex-1 min-w-0 bg-slate-900 border border-slate-700 text-slate-500 text-xs rounded px-2 py-1 font-mono focus:outline-none focus:border-slate-500');
+    const urlInput = el('input', 'flex-1 min-w-0 bg-slate-900 border border-slate-700 text-slate-500 text-xs rounded px-2 py-1 font-mono focus:outline-none focus:border-slate-400 focus:bg-slate-800');
     urlInput.placeholder = 'URL';
 
     let saving = false;
