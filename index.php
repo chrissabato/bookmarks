@@ -67,8 +67,8 @@ $title = $activeSet['title'] ?? 'Bookmarks';
           <?php foreach ($cat['bookmarks'] as $bm): ?>
             <?php
               $url  = $bm['url'];
-              $norm = str_starts_with($url, '//') ? 'https:' . $url : $url;
-              $isJs = str_starts_with($norm, 'javascript:');
+              $norm = strncmp($url, '//', 2) === 0 ? 'https:' . $url : $url;
+              $isJs = strncmp($norm, 'javascript:', 11) === 0;
               $fav  = '';
               if (!$isJs) {
                   try {
