@@ -70,7 +70,7 @@ $title = $activeSet['title'] ?? 'Bookmarks';
             <a href="<?= htmlspecialchars($url) ?>"
                <?= $isJs ? '' : 'target="_blank"' ?>
                class="link-row flex items-center gap-2 text-sm text-gray-300 hover:text-white
-                      hover:bg-gray-800 border border-gray-700 rounded px-2.5 py-1.5 transition-colors"
+                      bg-black hover:bg-gray-800 border border-gray-700 rounded px-2.5 py-1.5 transition-colors"
                data-label="<?= htmlspecialchars(strtolower($bm['label'])) ?>"
                data-url="<?= htmlspecialchars(strtolower($url)) ?>">
               <?php if (!empty($bm['icon'])): ?>
