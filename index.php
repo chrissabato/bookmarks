@@ -34,23 +34,23 @@ $title = $activeSet['title'] ?? 'Bookmarks';
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 </head>
-<body class="bg-black min-h-screen">
+<body class="bg-slate-950 min-h-screen">
 <div class="w-full px-4 pb-8">
 
-  <nav class="border-b border-gray-800 py-3 mb-4 flex items-center justify-between">
+  <nav class="border-b border-slate-800 py-3 mb-4 flex items-center justify-between">
     <h1 class="text-xl font-bold text-white uppercase tracking-wide">
       <?= htmlspecialchars($title) ?>
     </h1>
     <input id="search" type="search" placeholder="Search…"
-           class="bg-gray-900 border border-gray-700 text-gray-200 text-sm rounded px-3 py-1.5
-                  focus:outline-none focus:border-gray-500 w-48 placeholder-gray-600">
+           class="bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded px-3 py-1.5
+                  focus:outline-none focus:border-slate-500 w-48 placeholder-slate-500">
   </nav>
 
   <div class="columns-2 sm:columns-3 md:columns-4 lg:columns-5 xl:columns-6 2xl:columns-8 gap-3">
     <?php foreach ($categories as $cat): ?>
-      <div class="category-card bg-gray-900 rounded-lg border border-gray-800 mb-3 break-inside-avoid"
+      <div class="category-card bg-slate-800 rounded-lg border border-slate-700 mb-3 break-inside-avoid"
            data-name="<?= htmlspecialchars(strtolower($cat['name'])) ?>">
-        <div class="text-center text-sm font-semibold text-white uppercase tracking-wide py-2 px-3 border-b border-gray-800">
+        <div class="text-center text-sm font-semibold text-slate-200 uppercase tracking-wide py-2 px-3 border-b border-slate-700">
           <?= htmlspecialchars($cat['name']) ?>
         </div>
         <div class="flex flex-col p-2 gap-1">
@@ -69,15 +69,15 @@ $title = $activeSet['title'] ?? 'Bookmarks';
             ?>
             <a href="<?= htmlspecialchars($url) ?>"
                <?= $isJs ? '' : 'target="_blank"' ?>
-               class="link-row flex items-center gap-2 text-sm text-gray-300 hover:text-white
-                      bg-black hover:bg-gray-800 border border-gray-700 rounded px-2.5 py-1.5 transition-colors"
+               class="link-row flex items-center gap-2 text-sm text-slate-300 hover:text-white
+                      bg-slate-900 hover:bg-slate-700 border border-slate-700 rounded px-2.5 py-1.5 transition-colors"
                data-label="<?= htmlspecialchars(strtolower($bm['label'])) ?>"
                data-url="<?= htmlspecialchars(strtolower($url)) ?>">
               <?php if (!empty($bm['icon'])): ?>
-                <i class="<?= htmlspecialchars($bm['icon']) ?> w-4 text-center text-gray-500 shrink-0 text-sm"></i>
+                <i class="<?= htmlspecialchars($bm['icon']) ?> w-4 text-center text-slate-400 shrink-0 text-sm"></i>
               <?php elseif ($fav): ?>
                 <img src="<?= htmlspecialchars($fav) ?>" width="16" height="16"
-                     class="shrink-0 opacity-70" onerror="this.style.display='none'" loading="lazy">
+                     class="shrink-0 opacity-60" onerror="this.style.display='none'" loading="lazy">
               <?php endif; ?>
               <span><?= htmlspecialchars($bm['label']) ?></span>
             </a>

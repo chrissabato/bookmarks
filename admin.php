@@ -20,29 +20,29 @@ init_schema();
     .link-row:hover .del-btn { opacity: 1; }
   </style>
 </head>
-<body class="bg-black text-gray-300 min-h-screen">
+<body class="bg-slate-950 text-slate-300 min-h-screen">
 
 <!-- New Page Set Dialog -->
 <dialog id="new-set-dialog"
-        class="bg-gray-900 border border-gray-700 rounded-lg p-6 text-gray-300 w-full max-w-sm backdrop:bg-black/60">
+        class="bg-slate-800 border border-slate-700 rounded-lg p-6 text-slate-300 w-full max-w-sm backdrop:bg-slate-950/80">
   <h2 class="text-lg font-semibold text-white mb-4">New Page Set</h2>
   <div class="flex flex-col gap-3">
     <div>
-      <label class="text-xs text-gray-500 uppercase tracking-wider">Title</label>
+      <label class="text-xs text-slate-500 uppercase tracking-wider">Title</label>
       <input id="new-title" type="text" placeholder="e.g. Press Box"
-             class="mt-1 w-full bg-gray-800 border border-gray-700 text-white rounded px-3 py-2 text-sm focus:outline-none focus:border-gray-500">
+             class="mt-1 w-full bg-slate-900 border border-slate-700 text-white rounded px-3 py-2 text-sm focus:outline-none focus:border-slate-500">
     </div>
     <div>
-      <label class="text-xs text-gray-500 uppercase tracking-wider">Slug</label>
+      <label class="text-xs text-slate-500 uppercase tracking-wider">Slug</label>
       <input id="new-slug" type="text" placeholder="e.g. press-box"
-             class="mt-1 w-full bg-gray-800 border border-gray-700 text-white rounded px-3 py-2 text-sm font-mono focus:outline-none focus:border-gray-500">
-      <p class="text-xs text-gray-600 mt-1">Lowercase letters, numbers, hyphens only</p>
+             class="mt-1 w-full bg-slate-900 border border-slate-700 text-white rounded px-3 py-2 text-sm font-mono focus:outline-none focus:border-slate-500">
+      <p class="text-xs text-slate-500 mt-1">Lowercase letters, numbers, hyphens only</p>
     </div>
     <div class="flex gap-2 justify-end mt-2">
       <button onclick="document.getElementById('new-set-dialog').close()"
-              class="px-4 py-1.5 text-sm rounded border border-gray-700 hover:border-gray-500 transition-colors">Cancel</button>
+              class="px-4 py-1.5 text-sm rounded border border-slate-700 hover:border-slate-500 transition-colors">Cancel</button>
       <button onclick="createPageSet()"
-              class="px-4 py-1.5 text-sm rounded bg-white text-black font-medium hover:bg-gray-200 transition-colors">Create</button>
+              class="px-4 py-1.5 text-sm rounded bg-white text-black font-medium hover:bg-slate-200 transition-colors">Create</button>
     </div>
   </div>
 </dialog>
@@ -50,17 +50,17 @@ init_schema();
 <div class="max-w-5xl mx-auto px-4 py-4">
 
   <!-- Nav -->
-  <div class="border-b border-gray-800 pb-3 mb-4">
+  <div class="border-b border-slate-700 pb-3 mb-4">
     <div class="flex items-center justify-between gap-4 flex-wrap mb-3">
       <h1 class="text-xl font-bold text-white uppercase tracking-wide">Bookmarks Admin</h1>
       <div class="flex items-center gap-2">
         <button onclick="toggleSetManager()"
                 id="manage-btn"
-                class="text-xs px-3 py-1.5 rounded border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-white transition-colors">
+                class="text-xs px-3 py-1.5 rounded border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white transition-colors">
           Manage Sets
         </button>
         <a id="view-link" href="index.php" target="_blank"
-           class="text-xs px-3 py-1.5 rounded border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-white transition-colors">
+           class="text-xs px-3 py-1.5 rounded border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white transition-colors">
           View &rarr;
         </a>
       </div>
@@ -70,11 +70,11 @@ init_schema();
   </div>
 
   <!-- Page Set Manager (collapsible) -->
-  <div id="set-manager" class="hidden bg-gray-900 border border-gray-800 rounded-lg mb-4 p-4">
+  <div id="set-manager" class="hidden bg-slate-800 border border-slate-700 rounded-lg mb-4 p-4">
     <div class="flex items-center justify-between mb-3">
-      <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Page Sets</span>
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Page Sets</span>
       <button onclick="document.getElementById('new-set-dialog').showModal()"
-              class="text-xs px-2 py-1 rounded border border-dashed border-gray-700 hover:border-gray-500 text-gray-500 hover:text-gray-300 transition-colors">
+              class="text-xs px-2 py-1 rounded border border-dashed border-slate-700 hover:border-slate-500 text-slate-500 hover:text-slate-300 transition-colors">
         + New Set
       </button>
     </div>
@@ -84,7 +84,7 @@ init_schema();
   <!-- Category area -->
   <div id="category-list" class="flex flex-col gap-3"></div>
   <button onclick="addCategory()"
-          class="w-full mt-2 border border-dashed border-gray-800 hover:border-gray-600 text-gray-600 hover:text-gray-400 rounded-lg py-2.5 text-sm transition-colors">
+          class="w-full mt-2 border border-dashed border-slate-700 hover:border-slate-600 text-slate-500 hover:text-slate-400 rounded-lg py-2.5 text-sm transition-colors">
     + Add Category
   </button>
 
@@ -148,7 +148,7 @@ function renderTabs() {
         btn.className = `px-3 py-1 rounded text-sm font-medium transition-colors ${
             ps.id === state.activeId
                 ? 'bg-white text-black'
-                : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900'
         }`;
         btn.textContent = ps.title;
         btn.addEventListener('click', () => switchSet(ps.id));
@@ -182,11 +182,11 @@ function renderSetManager() {
         row.dataset.id = ps.id;
 
         const handle = document.createElement('span');
-        handle.className = 'drag-handle text-gray-700 hover:text-gray-400 text-sm select-none';
+        handle.className = 'drag-handle text-slate-600 hover:text-slate-400 text-sm select-none';
         handle.textContent = '⠿';
 
         const title = document.createElement('span');
-        title.className = 'flex-1 text-sm text-gray-300';
+        title.className = 'flex-1 text-sm text-slate-300';
         title.contentEditable = 'true';
         title.textContent = ps.title;
         title.addEventListener('blur', async () => {
@@ -202,11 +202,11 @@ function renderSetManager() {
         title.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); title.blur(); } });
 
         const slugBadge = document.createElement('span');
-        slugBadge.className = 'text-xs text-gray-600 font-mono';
+        slugBadge.className = 'text-xs text-slate-500 font-mono';
         slugBadge.textContent = ps.slug;
 
         const delBtn = document.createElement('button');
-        delBtn.className = 'del-btn opacity-0 group-hover:opacity-100 text-gray-700 hover:text-red-400 text-sm px-1 transition-colors';
+        delBtn.className = 'del-btn opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-400 text-sm px-1 transition-colors';
         delBtn.textContent = '✕';
         delBtn.addEventListener('click', async () => {
             if (!confirm(`Delete page set "${ps.title}"? All categories and bookmarks in it will be deleted.`)) return;
@@ -282,13 +282,13 @@ function renderCategories() {
 }
 
 function buildCategoryCard(cat) {
-    const card = el('div', 'bg-gray-900 border border-gray-800 rounded-lg');
+    const card = el('div', 'bg-slate-800 border border-slate-700 rounded-lg');
     card.dataset.id = cat.id;
 
     // Header
-    const header = el('div', 'flex items-center gap-2 px-3 py-2 border-b border-gray-800');
+    const header = el('div', 'flex items-center gap-2 px-3 py-2 border-b border-slate-700');
 
-    const handle = el('span', 'drag-handle text-gray-700 hover:text-gray-400 text-sm select-none');
+    const handle = el('span', 'drag-handle text-slate-600 hover:text-slate-400 text-sm select-none');
     handle.textContent = '⠿';
 
     const nameEl = el('div', 'flex-1 text-sm font-semibold text-white uppercase tracking-wide');
@@ -305,7 +305,7 @@ function buildCategoryCard(cat) {
     });
     nameEl.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); nameEl.blur(); } });
 
-    const delBtn = el('button', 'del-btn opacity-0 text-gray-700 hover:text-red-400 text-sm px-1 transition-colors');
+    const delBtn = el('button', 'del-btn opacity-0 text-slate-600 hover:text-red-400 text-sm px-1 transition-colors');
     delBtn.textContent = '✕';
     delBtn.addEventListener('click', async () => {
         if (!confirm(`Delete category "${cat.name}"?`)) return;
@@ -324,7 +324,7 @@ function buildCategoryCard(cat) {
     cat.bookmarks.forEach(bm => bmList.appendChild(buildBookmarkRow(bm, cat)));
 
     // Add link button
-    const addBtn = el('button', 'w-full mt-1 border border-dashed border-gray-800 hover:border-gray-600 text-gray-600 hover:text-gray-400 rounded py-1 text-xs transition-colors');
+    const addBtn = el('button', 'w-full mt-1 border border-dashed border-slate-700 hover:border-slate-600 text-slate-500 hover:text-slate-400 rounded py-1 text-xs transition-colors');
     addBtn.textContent = '+ Add Link';
     addBtn.addEventListener('click', () => appendNewBookmarkRow(bmList, cat));
 
@@ -341,13 +341,13 @@ function buildBookmarkRow(bm, cat) {
     const row = el('div', 'link-row flex items-center gap-1.5 group/row');
     row.dataset.id = bm.id;
 
-    const handle = el('span', 'drag-handle text-gray-700 hover:text-gray-400 text-xs select-none shrink-0');
+    const handle = el('span', 'drag-handle text-slate-600 hover:text-slate-400 text-xs select-none shrink-0');
     handle.textContent = '⠿';
 
     // Icon cell
     const iconCell = buildIconCell(bm);
 
-    const labelInput = el('input', 'w-32 shrink-0 bg-gray-800 border border-gray-700 text-gray-200 text-xs rounded px-2 py-1 focus:outline-none focus:border-gray-500');
+    const labelInput = el('input', 'w-32 shrink-0 bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded px-2 py-1 focus:outline-none focus:border-slate-500');
     labelInput.value = bm.label;
     labelInput.placeholder = 'Label';
     labelInput.addEventListener('change', async () => {
@@ -355,7 +355,7 @@ function buildBookmarkRow(bm, cat) {
         bm.label = labelInput.value;
     });
 
-    const urlInput = el('input', 'flex-1 min-w-0 bg-gray-800 border border-gray-700 text-gray-500 text-xs rounded px-2 py-1 font-mono focus:outline-none focus:border-gray-500');
+    const urlInput = el('input', 'flex-1 min-w-0 bg-slate-900 border border-slate-700 text-slate-500 text-xs rounded px-2 py-1 font-mono focus:outline-none focus:border-slate-500');
     urlInput.value = bm.url;
     urlInput.placeholder = 'URL';
     urlInput.addEventListener('change', async () => {
@@ -364,7 +364,7 @@ function buildBookmarkRow(bm, cat) {
         if (!bm.icon) renderIconDisplay(iconCell.querySelector('button'), bm);
     });
 
-    const delBtn = el('button', 'del-btn opacity-0 group-hover/row:opacity-100 text-gray-700 hover:text-red-400 text-xs px-1 shrink-0 transition-colors');
+    const delBtn = el('button', 'del-btn opacity-0 group-hover/row:opacity-100 text-slate-600 hover:text-red-400 text-xs px-1 shrink-0 transition-colors');
     delBtn.textContent = '✕';
     delBtn.addEventListener('click', async () => {
         await POST('bookmarks.delete', { id: bm.id });
@@ -409,7 +409,7 @@ function renderIconDisplay(btn, bm) {
 
 function buildIconCell(bm) {
     const wrap = el('div', 'relative shrink-0');
-    const btn = el('button', 'w-6 h-6 flex items-center justify-center rounded hover:bg-gray-700 transition-colors');
+    const btn = el('button', 'w-6 h-6 flex items-center justify-center rounded hover:bg-slate-700 transition-colors');
     btn.title = 'Set icon';
     renderIconDisplay(btn, bm);
 
@@ -426,17 +426,17 @@ function buildIconCell(bm) {
         const { name: currentName, weight: currentWeight } = parseIcon(bm.icon);
         let selectedWeight = currentWeight;
 
-        popover = el('div', 'absolute left-0 top-8 z-50 bg-gray-900 border border-gray-600 rounded-lg p-3 shadow-2xl w-56');
+        popover = el('div', 'absolute left-0 top-8 z-50 bg-slate-800 border border-slate-600 rounded-lg p-3 shadow-2xl w-56');
 
         // Preview
         const previewRow = el('div', 'flex items-center gap-2 mb-2');
         const preview = el('i', (bm.icon || '') + ' text-indigo-400 text-lg w-6 text-center');
-        const previewLabel = el('span', 'text-xs text-gray-500 truncate');
+        const previewLabel = el('span', 'text-xs text-slate-500 truncate');
         previewLabel.textContent = currentName || 'No icon set';
         previewRow.append(preview, previewLabel);
 
         // Name input
-        const input = el('input', 'w-full bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-2 py-1.5 font-mono focus:outline-none focus:border-gray-500 mb-2');
+        const input = el('input', 'w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded px-2 py-1.5 font-mono focus:outline-none focus:border-slate-500 mb-2');
         input.placeholder = 'e.g. video-camera';
         input.value = currentName;
 
@@ -444,14 +444,14 @@ function buildIconCell(bm) {
         const weights = ['regular', 'fill', 'bold'];
         const weightRow = el('div', 'flex gap-1 mb-2');
         weights.forEach(w => {
-            const wb = el('button', `flex-1 text-xs rounded py-1 transition-colors border ${w === selectedWeight ? 'bg-white text-black border-white' : 'bg-black border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'}`);
+            const wb = el('button', `flex-1 text-xs rounded py-1 transition-colors border ${w === selectedWeight ? 'bg-white text-black border-white' : 'bg-slate-950 border-slate-700 text-slate-400 hover:border-slate-500 hover:text-white'}`);
             wb.textContent = w;
             wb.dataset.weight = w;
             wb.addEventListener('click', () => {
                 selectedWeight = w;
                 weightRow.querySelectorAll('button').forEach(b => {
                     const active = b.dataset.weight === w;
-                    b.className = `flex-1 text-xs rounded py-1 transition-colors border ${active ? 'bg-white text-black border-white' : 'bg-black border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'}`;
+                    b.className = `flex-1 text-xs rounded py-1 transition-colors border ${active ? 'bg-white text-black border-white' : 'bg-slate-950 border-slate-700 text-slate-400 hover:border-slate-500 hover:text-white'}`;
                 });
                 preview.className = buildIconClass(input.value.trim(), selectedWeight) + ' text-indigo-400 text-lg w-6 text-center';
             });
@@ -466,7 +466,7 @@ function buildIconCell(bm) {
 
         // Action buttons
         const actionRow = el('div', 'flex gap-1.5 mb-2');
-        const setBtn = el('button', 'flex-1 bg-white text-black text-xs font-medium rounded px-2 py-1 hover:bg-gray-200 transition-colors');
+        const setBtn = el('button', 'flex-1 bg-white text-black text-xs font-medium rounded px-2 py-1 hover:bg-slate-200 transition-colors');
         setBtn.textContent = 'Set';
         setBtn.addEventListener('click', async () => {
             const icon = buildIconClass(input.value.trim(), selectedWeight);
@@ -476,7 +476,7 @@ function buildIconCell(bm) {
             closePopover();
         });
 
-        const clearBtn = el('button', 'px-2 py-1 text-xs rounded border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-white transition-colors');
+        const clearBtn = el('button', 'px-2 py-1 text-xs rounded border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white transition-colors');
         clearBtn.textContent = 'Clear';
         clearBtn.addEventListener('click', async () => {
             await POST('bookmarks.update', { id: bm.id, icon: '' });
@@ -486,7 +486,7 @@ function buildIconCell(bm) {
         });
         actionRow.append(setBtn, clearBtn);
 
-        const link = el('a', 'block text-xs text-gray-600 hover:text-gray-400 transition-colors text-center');
+        const link = el('a', 'block text-xs text-slate-500 hover:text-slate-400 transition-colors text-center');
         link.href = 'https://phosphoricons.com';
         link.target = '_blank';
         link.textContent = 'Browse icons ↗';
@@ -515,10 +515,10 @@ function appendNewBookmarkRow(bmList, cat) {
 
     const fav = el('div', 'w-4 h-4 shrink-0'); // placeholder space
 
-    const labelInput = el('input', 'w-32 shrink-0 bg-gray-800 border border-gray-700 text-gray-200 text-xs rounded px-2 py-1 focus:outline-none focus:border-gray-500');
+    const labelInput = el('input', 'w-32 shrink-0 bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded px-2 py-1 focus:outline-none focus:border-slate-500');
     labelInput.placeholder = 'Label';
 
-    const urlInput = el('input', 'flex-1 min-w-0 bg-gray-800 border border-gray-700 text-gray-500 text-xs rounded px-2 py-1 font-mono focus:outline-none focus:border-gray-500');
+    const urlInput = el('input', 'flex-1 min-w-0 bg-slate-900 border border-slate-700 text-slate-500 text-xs rounded px-2 py-1 font-mono focus:outline-none focus:border-slate-500');
     urlInput.placeholder = 'URL';
 
     let saving = false;
