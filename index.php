@@ -15,7 +15,7 @@ if ($activeSet) {
     $stmt = $pdo->prepare("SELECT id, name FROM categories WHERE page_set_id=? ORDER BY position");
     $stmt->execute([$activeSet['id']]);
     foreach ($stmt->fetchAll() as $cat) {
-        $bStmt = $pdo->prepare("SELECT label, url FROM bookmarks WHERE category_id=? ORDER BY position");
+        $bStmt = $pdo->prepare("SELECT label, url, icon FROM bookmarks WHERE category_id=? ORDER BY position");
         $bStmt->execute([$cat['id']]);
         $cat['bookmarks'] = $bStmt->fetchAll();
         $categories[] = $cat;
@@ -30,6 +30,7 @@ $title = $activeSet['title'] ?? 'Bookmarks';
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= htmlspecialchars($title) ?></title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body class="bg-black min-h-screen">
 <div class="w-full px-4 pb-8">
@@ -70,7 +71,9 @@ $title = $activeSet['title'] ?? 'Bookmarks';
                       hover:bg-gray-800 border border-gray-700 rounded px-2.5 py-1.5 transition-colors"
                data-label="<?= htmlspecialchars(strtolower($bm['label'])) ?>"
                data-url="<?= htmlspecialchars(strtolower($url)) ?>">
-              <?php if ($fav): ?>
+              <?php if (!empty($bm['icon'])): ?>
+                <i class="<?= htmlspecialchars($bm['icon']) ?> w-4 text-center text-gray-500 shrink-0 text-sm"></i>
+              <?php elseif ($fav): ?>
                 <img src="<?= htmlspecialchars($fav) ?>" width="16" height="16"
                      class="shrink-0 opacity-70" onerror="this.style.display='none'" loading="lazy">
               <?php endif; ?>

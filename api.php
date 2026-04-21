@@ -116,7 +116,7 @@ try {
             $result = [];
             foreach ($cats->fetchAll() as $cat) {
                 $bStmt = $pdo->prepare(
-                    "SELECT id, label, url, position FROM bookmarks WHERE category_id=? ORDER BY position"
+                    "SELECT id, label, url, icon, position FROM bookmarks WHERE category_id=? ORDER BY position"
                 );
                 $bStmt->execute([$cat['id']]);
                 $cat['bookmarks'] = $bStmt->fetchAll();
@@ -169,10 +169,11 @@ try {
             $stmt  = $pdo->prepare("SELECT COALESCE(MAX(position)+1,0) FROM bookmarks WHERE category_id=?");
             $stmt->execute([$catId]);
             $max   = (int)$stmt->fetchColumn();
-            $pdo->prepare("INSERT INTO bookmarks (category_id,label,url,position) VALUES (?,?,?,?)")
-                ->execute([$catId, $label, $url, $max]);
+            $icon = $_POST['icon'] ?? null ?: null;
+            $pdo->prepare("INSERT INTO bookmarks (category_id,label,url,icon,position) VALUES (?,?,?,?,?)")
+                ->execute([$catId, $label, $url, $icon, $max]);
             $id = (int)$pdo->lastInsertId();
-            echo json_encode(['id' => $id, 'label' => $label, 'url' => $url, 'position' => $max]);
+            echo json_encode(['id' => $id, 'label' => $label, 'url' => $url, 'icon' => $icon, 'position' => $max]);
             break;
 
         case 'bookmarks.update':
@@ -181,6 +182,7 @@ try {
             $params = [];
             if (array_key_exists('label', $_POST)) { $fields[] = 'label=?'; $params[] = $_POST['label']; }
             if (array_key_exists('url',   $_POST)) { $fields[] = 'url=?';   $params[] = $_POST['url']; }
+            if (array_key_exists('icon',  $_POST)) { $fields[] = 'icon=?';  $params[] = $_POST['icon'] ?: null; }
             if ($fields) {
                 $params[] = $id;
                 $pdo->prepare("UPDATE bookmarks SET " . implode(',', $fields) . " WHERE id=?")->execute($params);

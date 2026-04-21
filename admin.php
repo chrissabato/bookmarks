@@ -8,6 +8,7 @@ init_schema();
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bookmarks Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
   <style>
     .sortable-ghost { opacity: 0.4; }
@@ -341,13 +342,8 @@ function buildBookmarkRow(bm, cat) {
     const handle = el('span', 'drag-handle text-gray-700 hover:text-gray-400 text-xs select-none shrink-0');
     handle.textContent = '⠿';
 
-    // Favicon
-    const favUrl = faviconUrl(bm.url);
-    const fav = el('img', 'w-4 h-4 shrink-0 opacity-60');
-    fav.src = favUrl || '';
-    fav.width = 16; fav.height = 16;
-    fav.onerror = () => fav.style.display = 'none';
-    if (!favUrl) fav.style.display = 'none';
+    // Icon cell
+    const iconCell = buildIconCell(bm);
 
     const labelInput = el('input', 'w-32 shrink-0 bg-gray-800 border border-gray-700 text-gray-200 text-xs rounded px-2 py-1 focus:outline-none focus:border-gray-500');
     labelInput.value = bm.label;
@@ -363,9 +359,7 @@ function buildBookmarkRow(bm, cat) {
     urlInput.addEventListener('change', async () => {
         await POST('bookmarks.update', { id: bm.id, url: urlInput.value });
         bm.url = urlInput.value;
-        const newFav = faviconUrl(urlInput.value);
-        fav.src = newFav;
-        fav.style.display = newFav ? '' : 'none';
+        if (!bm.icon) renderIconDisplay(iconCell.querySelector('button'), bm);
     });
 
     const delBtn = el('button', 'del-btn opacity-0 group-hover/row:opacity-100 text-gray-700 hover:text-red-400 text-xs px-1 shrink-0 transition-colors');
@@ -376,8 +370,103 @@ function buildBookmarkRow(bm, cat) {
         row.remove();
     });
 
-    row.append(handle, fav, labelInput, urlInput, delBtn);
+    row.append(handle, iconCell, labelInput, urlInput, delBtn);
     return row;
+}
+
+// ── Icon cell ─────────────────────────────────────────────────────────────────
+function renderIconDisplay(btn, bm) {
+    btn.innerHTML = '';
+    if (bm.icon) {
+        const i = document.createElement('i');
+        i.className = bm.icon + ' text-indigo-400 text-sm';
+        btn.appendChild(i);
+    } else {
+        const img = document.createElement('img');
+        img.src = faviconUrl(bm.url);
+        img.width = 16; img.height = 16;
+        img.className = 'opacity-60';
+        img.onerror = () => { img.style.display = 'none'; };
+        btn.appendChild(img);
+    }
+}
+
+function buildIconCell(bm) {
+    const wrap = el('div', 'relative shrink-0');
+    const btn = el('button', 'w-6 h-6 flex items-center justify-center rounded hover:bg-gray-700 transition-colors');
+    btn.title = 'Set icon';
+    renderIconDisplay(btn, bm);
+
+    let popover = null;
+
+    function closePopover() {
+        if (popover) { popover.remove(); popover = null; }
+    }
+
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (popover) { closePopover(); return; }
+
+        popover = el('div', 'absolute left-0 top-8 z-50 bg-gray-900 border border-gray-600 rounded-lg p-3 shadow-2xl w-64');
+
+        const previewRow = el('div', 'flex items-center gap-2 mb-2');
+        const preview = el('i', (bm.icon || '') + ' text-indigo-400 text-base w-5 text-center');
+        const previewLabel = el('span', 'text-xs text-gray-500 truncate');
+        previewLabel.textContent = bm.icon || 'No icon set';
+        previewRow.append(preview, previewLabel);
+
+        const input = el('input', 'w-full bg-gray-800 border border-gray-700 text-gray-200 text-xs rounded px-2 py-1.5 font-mono focus:outline-none focus:border-gray-500 mb-2');
+        input.placeholder = 'e.g. fa-solid fa-camera';
+        input.value = bm.icon || '';
+        input.addEventListener('input', () => {
+            preview.className = input.value.trim() + ' text-indigo-400 text-base w-5 text-center';
+            previewLabel.textContent = input.value.trim() || 'No icon set';
+        });
+
+        const btnRow = el('div', 'flex gap-1.5 mb-2');
+        const setBtn = el('button', 'flex-1 bg-white text-black text-xs font-medium rounded px-2 py-1 hover:bg-gray-200 transition-colors');
+        setBtn.textContent = 'Set';
+        setBtn.addEventListener('click', async () => {
+            const icon = input.value.trim();
+            await POST('bookmarks.update', { id: bm.id, icon });
+            bm.icon = icon;
+            renderIconDisplay(btn, bm);
+            closePopover();
+        });
+
+        const clearBtn = el('button', 'px-2 py-1 text-xs rounded border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-white transition-colors');
+        clearBtn.textContent = 'Clear';
+        clearBtn.addEventListener('click', async () => {
+            await POST('bookmarks.update', { id: bm.id, icon: '' });
+            bm.icon = '';
+            renderIconDisplay(btn, bm);
+            closePopover();
+        });
+
+        btnRow.append(setBtn, clearBtn);
+
+        const link = el('a', 'block text-xs text-gray-600 hover:text-gray-400 transition-colors text-center');
+        link.href = 'https://fontawesome.com/icons';
+        link.target = '_blank';
+        link.textContent = 'Browse icons ↗';
+
+        popover.append(previewRow, input, btnRow, link);
+        wrap.appendChild(popover);
+        setTimeout(() => input.focus(), 10);
+
+        const outsideClick = (e) => {
+            if (!wrap.contains(e.target)) { closePopover(); document.removeEventListener('click', outsideClick); }
+        };
+        document.addEventListener('click', outsideClick);
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') { closePopover(); document.removeEventListener('click', outsideClick); }
+            if (e.key === 'Enter') setBtn.click();
+        });
+    });
+
+    wrap.appendChild(btn);
+    return wrap;
 }
 
 function appendNewBookmarkRow(bmList, cat) {

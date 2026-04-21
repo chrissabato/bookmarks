@@ -36,4 +36,9 @@ function init_schema(): void {
         CREATE INDEX IF NOT EXISTS idx_categories_set ON categories(page_set_id, position);
         CREATE INDEX IF NOT EXISTS idx_bookmarks_cat  ON bookmarks(category_id, position);
     ");
+    // Add icon column to existing databases
+    $cols = array_column($pdo->query("PRAGMA table_info(bookmarks)")->fetchAll(), 'name');
+    if (!in_array('icon', $cols)) {
+        $pdo->exec("ALTER TABLE bookmarks ADD COLUMN icon TEXT DEFAULT NULL");
+    }
 }
