@@ -3,16 +3,11 @@ require __DIR__ . '/db.php';
 init_schema();
 $pdo = get_db();
 
-// Load all page sets for the tab strip
-$pageSets = $pdo->query("SELECT id, slug, title FROM page_sets ORDER BY position")->fetchAll();
-
 // Determine active set
-$activeSlug = $_GET['set'] ?? ($pageSets[0]['slug'] ?? '');
-$activeSet  = null;
-foreach ($pageSets as $ps) {
-    if ($ps['slug'] === $activeSlug) { $activeSet = $ps; break; }
-}
-if (!$activeSet && $pageSets) { $activeSet = $pageSets[0]; $activeSlug = $activeSet['slug']; }
+$activeSlug = $_GET['set'] ?? 'root';
+$activeSet  = $pdo->prepare("SELECT id, slug, title FROM page_sets WHERE slug=?");
+$activeSet->execute([$activeSlug]);
+$activeSet  = $activeSet->fetch() ?: null;
 
 // Load categories + bookmarks for the active set
 $categories = [];
@@ -39,18 +34,10 @@ $title = $activeSet['title'] ?? 'Bookmarks';
 <body class="bg-black min-h-screen">
 <div class="w-full px-4 pb-8">
 
-  <nav class="border-b border-gray-800 py-3 mb-4 flex flex-wrap items-center gap-3 justify-between">
-    <div class="flex flex-wrap items-center gap-1.5">
-      <?php foreach ($pageSets as $ps): ?>
-        <a href="?set=<?= urlencode($ps['slug']) ?>"
-           class="px-3 py-1 rounded text-sm font-medium transition-colors
-                  <?= $ps['slug'] === $activeSlug
-                      ? 'bg-white text-black'
-                      : 'text-gray-400 hover:text-white hover:bg-gray-800' ?>">
-          <?= htmlspecialchars($ps['title']) ?>
-        </a>
-      <?php endforeach; ?>
-    </div>
+  <nav class="border-b border-gray-800 py-3 mb-4 flex items-center justify-between">
+    <h1 class="text-xl font-bold text-white uppercase tracking-wide">
+      <?= htmlspecialchars($title) ?>
+    </h1>
     <input id="search" type="search" placeholder="Search…"
            class="bg-gray-900 border border-gray-700 text-gray-200 text-sm rounded px-3 py-1.5
                   focus:outline-none focus:border-gray-500 w-48 placeholder-gray-600">
