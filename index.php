@@ -53,7 +53,7 @@ $title = $activeSet['title'] ?? 'Bookmarks';
         <div class="text-center text-sm font-semibold text-slate-200 uppercase tracking-wide py-2 px-3 border-b border-slate-700">
           <?= htmlspecialchars($cat['name']) ?>
         </div>
-        <div class="flex flex-col p-2 gap-1">
+        <div class="flex flex-col p-2 gap-1.5">
           <?php foreach ($cat['bookmarks'] as $bm): ?>
             <?php
               $url  = $bm['url'];
