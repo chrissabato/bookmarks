@@ -444,14 +444,14 @@ function buildIconCell(bm) {
         const weights = ['regular', 'fill', 'bold'];
         const weightRow = el('div', 'flex gap-1 mb-2');
         weights.forEach(w => {
-            const wb = el('button', `flex-1 text-xs rounded py-1 transition-colors border ${w === selectedWeight ? 'bg-white text-black border-white' : 'border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'}`);
+            const wb = el('button', `flex-1 text-xs rounded py-1 transition-colors border ${w === selectedWeight ? 'bg-white text-black border-white' : 'bg-black border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'}`);
             wb.textContent = w;
             wb.dataset.weight = w;
             wb.addEventListener('click', () => {
                 selectedWeight = w;
                 weightRow.querySelectorAll('button').forEach(b => {
                     const active = b.dataset.weight === w;
-                    b.className = `flex-1 text-xs rounded py-1 transition-colors border ${active ? 'bg-white text-black border-white' : 'border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'}`;
+                    b.className = `flex-1 text-xs rounded py-1 transition-colors border ${active ? 'bg-white text-black border-white' : 'bg-black border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'}`;
                 });
                 preview.className = buildIconClass(input.value.trim(), selectedWeight) + ' text-indigo-400 text-lg w-6 text-center';
             });
