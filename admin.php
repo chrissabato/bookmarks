@@ -555,7 +555,8 @@ function initCategorySortable(container) {
     container._sortable = Sortable.create(container, {
         handle: '.drag-handle',
         animation: 150,
-        filter: '.bookmark-list',
+        filter: '.bookmark-list, input, button, a, [contenteditable]',
+        preventOnFilter: false,
         onEnd: async () => {
             const ids = [...container.querySelectorAll(':scope > [data-id]')].map(el => parseInt(el.dataset.id));
             await POST('categories.reorder', { page_set_id: state.activeId, ids: JSON.stringify(ids) });
@@ -571,7 +572,8 @@ function initBookmarkSortable(bmList) {
         group: 'bookmarks',
         handle: '.drag-handle',
         animation: 150,
-        filter: '.new-row',
+        filter: '.new-row, input, button, a, [contenteditable]',
+        preventOnFilter: false,
         onEnd: async (evt) => {
             const fromCatId = parseInt(evt.from.dataset.catId);
             const toCatId   = parseInt(evt.to.dataset.catId);
