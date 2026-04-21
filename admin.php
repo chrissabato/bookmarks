@@ -8,7 +8,9 @@ init_schema();
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bookmarks Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
   <style>
     .sortable-ghost { opacity: 0.4; }
@@ -416,7 +418,7 @@ function buildIconCell(bm) {
         previewRow.append(preview, previewLabel);
 
         const input = el('input', 'w-full bg-gray-800 border border-gray-700 text-gray-200 text-xs rounded px-2 py-1.5 font-mono focus:outline-none focus:border-gray-500 mb-2');
-        input.placeholder = 'e.g. fa-solid fa-camera';
+        input.placeholder = 'e.g. ph ph-camera or ph-fill ph-camera';
         input.value = bm.icon || '';
         input.addEventListener('input', () => {
             preview.className = input.value.trim() + ' text-indigo-400 text-base w-5 text-center';
@@ -446,7 +448,7 @@ function buildIconCell(bm) {
         btnRow.append(setBtn, clearBtn);
 
         const link = el('a', 'block text-xs text-gray-600 hover:text-gray-400 transition-colors text-center');
-        link.href = 'https://fontawesome.com/icons';
+        link.href = 'https://phosphoricons.com';
         link.target = '_blank';
         link.textContent = 'Browse icons ↗';
 
