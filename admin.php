@@ -203,7 +203,7 @@ function renderSetManager() {
         slugBadge.textContent = ps.slug;
 
         const delBtn = document.createElement('button');
-        delBtn.className = 'del-btn opacity-0 text-gray-700 hover:text-red-400 text-sm px-1 transition-colors';
+        delBtn.className = 'del-btn opacity-0 group-hover:opacity-100 text-gray-700 hover:text-red-400 text-sm px-1 transition-colors';
         delBtn.textContent = '✕';
         delBtn.addEventListener('click', async () => {
             if (!confirm(`Delete page set "${ps.title}"? All categories and bookmarks in it will be deleted.`)) return;
