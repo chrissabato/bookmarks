@@ -1,1 +1,1 @@
-<?php header('Location: ../index.php?set=broadcast', true, 302); exit;
+<?php $_GET['set'] = 'broadcast'; include('../index.php');

@@ -1,1 +1,1 @@
-<?php header('Location: ../index.php?set=stadium', true, 302); exit;
+<?php $_GET['set'] = 'stadium'; include('../index.php');
