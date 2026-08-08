@@ -16,7 +16,10 @@ return [
 
     // Usernames allowed to view restricted sets when authenticated via
     // Shibboleth (requires a Shibboleth SP configured in Apache — see the
-    // AuthType shibboleth lines in .htaccess). Leave empty to disable.
+    // AuthType shibboleth lines in .htaccess). Anonymous visitors get sent
+    // to your SP's login page (/Shibboleth.sso/Login) automatically.
+    // Leave this list EMPTY to allow ANY authenticated Shibboleth user
+    // (still requires login — just no username restriction).
     'shibboleth_users' => [
         // 'jdoe',
     ],

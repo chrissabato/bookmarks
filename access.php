@@ -6,9 +6,10 @@ function check_access(bool $isPublic): void {
     if ($isPublic) return;
 
     $configFile = __DIR__ . '/config.php';
-    $config = file_exists($configFile) ? require $configFile : [];
-    $ipRanges  = $config['trusted_ip_ranges'] ?? [];
-    $shibUsers = $config['shibboleth_users'] ?? [];
+    $hasConfig  = file_exists($configFile);
+    $config     = $hasConfig ? require $configFile : [];
+    $ipRanges   = $config['trusted_ip_ranges'] ?? [];
+    $shibUsers  = $config['shibboleth_users'] ?? [];
 
     $remoteIp = $_SERVER['REMOTE_ADDR'] ?? '';
     foreach ($ipRanges as $range) {
@@ -17,12 +18,14 @@ function check_access(bool $isPublic): void {
 
     $shibUser = $_SERVER['REMOTE_USER'] ?? $_SERVER['eppn'] ?? '';
     if ($shibUser !== '') {
-        if (in_array($shibUser, $shibUsers, true)) return;
-    } elseif ($shibUsers) {
-        // No session yet, but Shibboleth is configured — offer a login
-        // instead of a flat deny. Once logged in, mod_shib populates
-        // REMOTE_USER passively (no directory-wide requireSession needed)
-        // and the visitor lands back here to be re-checked above.
+        // An empty allow-list means "any authenticated user is fine".
+        if (!$shibUsers || in_array($shibUser, $shibUsers, true)) return;
+    } elseif ($hasConfig) {
+        // No session yet, but this install has config.php set up for
+        // restricted access — offer a login instead of a flat deny. Once
+        // logged in, mod_shib populates REMOTE_USER passively (no
+        // directory-wide requireSession needed) and the visitor lands back
+        // here to be re-checked above.
         $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         $target = $scheme . '://' . ($_SERVER['HTTP_HOST'] ?? '') . ($_SERVER['REQUEST_URI'] ?? '/');
         header('Location: /Shibboleth.sso/Login?target=' . urlencode($target));
