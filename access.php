@@ -16,7 +16,18 @@ function check_access(bool $isPublic): void {
     }
 
     $shibUser = $_SERVER['REMOTE_USER'] ?? $_SERVER['eppn'] ?? '';
-    if ($shibUser !== '' && in_array($shibUser, $shibUsers, true)) return;
+    if ($shibUser !== '') {
+        if (in_array($shibUser, $shibUsers, true)) return;
+    } elseif ($shibUsers) {
+        // No session yet, but Shibboleth is configured — offer a login
+        // instead of a flat deny. Once logged in, mod_shib populates
+        // REMOTE_USER passively (no directory-wide requireSession needed)
+        // and the visitor lands back here to be re-checked above.
+        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $target = $scheme . '://' . ($_SERVER['HTTP_HOST'] ?? '') . ($_SERVER['REQUEST_URI'] ?? '/');
+        header('Location: /Shibboleth.sso/Login?target=' . urlencode($target));
+        exit;
+    }
 
     http_response_code(403);
     header('Content-Type: text/plain');
