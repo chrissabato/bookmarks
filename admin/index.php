@@ -162,7 +162,7 @@ function renderTabs() {
     // Update view link
     const active = state.pageSets.find(p => p.id === state.activeId);
     const viewLink = document.getElementById('view-link');
-    if (active) viewLink.href = `../index.php?set=${encodeURIComponent(active.slug)}`;
+    if (active) viewLink.href = `../${encodeURIComponent(active.slug)}`;
 }
 
 async function switchSet(id) {
