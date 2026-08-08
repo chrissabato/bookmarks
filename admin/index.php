@@ -214,7 +214,7 @@ function renderSetManager() {
         const publicCheckbox = document.createElement('input');
         publicCheckbox.type = 'checkbox';
         publicCheckbox.className = 'rounded bg-slate-900 border-slate-700';
-        publicCheckbox.checked = !!ps.is_public;
+        publicCheckbox.checked = Number(ps.is_public) === 1;
         publicCheckbox.addEventListener('change', async () => {
             ps.is_public = publicCheckbox.checked ? 1 : 0;
             await POST('page_sets.update', { id: ps.id, is_public: publicCheckbox.checked ? '1' : '' });
