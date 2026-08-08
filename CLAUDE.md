@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-A PHP bookmark dashboard for Willamette University Athletics staff. Dark Tailwind UI, SQLite-backed, with a full admin interface. Serves four page sets (Sports Info, Athletic Communications, Broadcast, Stadium).
+A PHP bookmark dashboard, originally built for Willamette University Athletics staff but designed to be self-hostable by anyone. Dark Tailwind UI, SQLite-backed, with a full admin interface. Page sets are created dynamically through the admin UI — there's no fixed list.
 
 ## Stack
 
@@ -18,19 +18,21 @@ A PHP bookmark dashboard for Willamette University Athletics staff. Dark Tailwin
 | File | Purpose |
 |------|---------|
 | `db.php` | PDO singleton (`get_db()`) + `init_schema()` — included by all other PHP files |
+| `access.php` | `check_access(bool $isPublic)` — viewer-side gate for non-public page sets, reads `config.php` |
 | `api.php` | JSON API for admin — all CRUD and reorder operations via `?action=` |
 | `index.php` | Public viewer — reads DB, renders card grid, live search |
 | `admin.php` | Admin SPA shell — all JS state management, no page reloads |
 | `bookmarks.db` | SQLite database (blocked from direct HTTP access via `.htaccess`) |
+| `config.php` | Gitignored — trusted IP ranges / Shibboleth usernames for restricted page sets. Copy from `config.example.php` |
+| `.htaccess` | Gitignored — real Apache/Shibboleth rules. Copy from `.htaccess.example` |
 | `migrate.php` | One-time JSON→SQLite migration (keep as reference; do not re-run against live DB) |
-| `bearcats/`, `broadcast/`, `stadium/` | Legacy subdirectory URLs — each `index.php` redirects to `../index.php?set=<slug>` |
 
 ## Database Schema
 
 ```sql
-page_sets  (id, slug TEXT UNIQUE, title, position)
+page_sets  (id, slug TEXT UNIQUE, title, position, is_public INTEGER DEFAULT 0)
 categories (id, page_set_id FK→page_sets, name, position)
-bookmarks  (id, category_id FK→categories, label, url, position)
+bookmarks  (id, category_id FK→categories, label, url, position, icon)
 ```
 
 All three tables use `position INTEGER` for ordering. Deletes cascade. `bookmarks.db` lives in the project root; the `.htaccess` `<Files>` block denies direct HTTP access to it.
@@ -39,7 +41,7 @@ All three tables use `position INTEGER` for ordering. Deletes cascade. `bookmark
 
 Actions are passed as `?action=<entity>.<verb>`. GET for list operations, POST for all writes.
 
-- **page_sets**: `list`, `create` (slug, title), `update` (id, slug?, title?), `delete` (id), `reorder` (ids JSON array)
+- **page_sets**: `list`, `create` (slug, title, is_public?), `update` (id, slug?, title?, is_public?), `delete` (id), `reorder` (ids JSON array)
 - **categories**: `list` (page_set_id) → nested with bookmarks, `create`, `update`, `delete`, `reorder`
 - **bookmarks**: `create`, `update`, `delete`, `reorder`, `move` (id, target_category_id)
 
@@ -52,20 +54,25 @@ Reorder operations accept a complete ordered `ids` JSON array and rewrite all `p
 - Bookmark fields: `<input>` elements; `change` event → `bookmarks.update`
 - New bookmark: blank inline row appended; `blur` with both fields filled → `bookmarks.create`
 - Cross-category drag: SortableJS `group:'bookmarks'`; fires `bookmarks.move` then `bookmarks.reorder`
-- Page set manager: collapsible panel under "Manage Sets" button; SortableJS reorder + `contenteditable` rename + delete
+- Page set manager: collapsible panel under "Manage Sets" button; SortableJS reorder + `contenteditable` rename + delete + per-row "Public" checkbox (`is_public`, wired to `page_sets.update`)
+- New Page Set dialog also has a "Public" checkbox, passed to `page_sets.create`
 
 ## Viewer behavior
 
-- Active page set determined by `?set=slug`; defaults to first by position
+- Active page set determined by `?set=slug`; a root `.htaccess` rewrite also maps any `/some-slug` URL to `index.php?set=some-slug` (see Access control) so every page set gets a clean URL automatically — no per-set folders needed
+- `index.php` calls `check_access((bool)$activeSet['is_public'])` right after loading the page set; non-public sets 403 unless the visitor's IP/Shibboleth identity clears `access.php`
 - Favicons via Google S2 (`https://www.google.com/s2/favicons?domain=…&sz=32`); `onerror` hides failures
 - `javascript:` bookmarklet URLs are rendered without `target="_blank"` and without a favicon
 - Live search filters both label text and URL; hides empty category cards
 
 ## Access control
 
-`.htaccess` at root: campus IP range `158.104.0.0/16` OR Shibboleth user `csabato`.  
-`bearcats/.htaccess`: `Satisfy Any` (open access).  
-`broadcast/` and `stadium/`: inherit root restrictions.
+Two layers, both configured via gitignored files (copy from the `.example` templates):
+
+- **`admin.php` / `api.php`** — always restricted at the Apache level via a `<FilesMatch>` block in `.htaccess` (campus IP range or Shibboleth user). Never affected by a page set's `is_public` flag.
+- **`index.php`** — no blanket Apache restriction; each page set's `is_public` column decides access. Non-public sets are checked in PHP by `access.php`, which reads trusted IP ranges / allowed Shibboleth usernames from `config.php`.
+
+For a fresh self-hosted install: `cp .htaccess.example .htaccess` and `cp config.example.php config.php`, then fill in your own IP range/Shibboleth username (or leave both empty and mark every page set public).
 
 ## Special link types (preserved from original data)
 

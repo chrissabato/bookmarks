@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
 
-# Create the database and schema
-php setup.php
-
-# Set permissions for Apache
+# The schema self-initializes on first request (see db.php init_schema()),
+# so touch the db file first if it doesn't exist yet, then fix permissions
+# so Apache can write to it.
+touch bookmarks.db
 chgrp apache bookmarks.db
 chmod 664 bookmarks.db
 chgrp apache .
 chmod g+s .
 
-echo "Done. You can now delete setup.php and setup.sh."
+echo "Done. You can now delete setup.sh."

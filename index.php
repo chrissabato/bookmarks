@@ -1,13 +1,16 @@
 <?php
 require __DIR__ . '/db.php';
+require __DIR__ . '/access.php';
 init_schema();
 $pdo = get_db();
 
 // Determine active set
 $activeSlug = $_GET['set'] ?? 'root';
-$activeSet  = $pdo->prepare("SELECT id, slug, title FROM page_sets WHERE slug=?");
+$activeSet  = $pdo->prepare("SELECT id, slug, title, is_public FROM page_sets WHERE slug=?");
 $activeSet->execute([$activeSlug]);
 $activeSet  = $activeSet->fetch() ?: null;
+
+check_access((bool)($activeSet['is_public'] ?? false));
 
 // Load categories + bookmarks for the active set
 $categories = [];

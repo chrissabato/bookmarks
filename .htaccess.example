@@ -1,0 +1,46 @@
+# Copy this file to .htaccess and fill in your own values.
+# .htaccess is gitignored so your institution's specific values never get
+# committed. See config.example.php for the matching viewer-side config.
+
+# 1. Setup Shibboleth but don't force it yet — this lets index.php read
+#    REMOTE_USER passively (see access.php) without redirecting anonymous
+#    visitors to the IdP. Remove this whole section if you don't use
+#    Shibboleth.
+AuthType shibboleth
+ShibRequestSetting requireSession 0
+# The line below is often necessary to allow the IP check to pass
+# without immediately redirecting to the IDP
+ShibRequestSetting redirectLimit 0
+
+# 2. admin.php and api.php always require your trusted network or
+#    Shibboleth login — they're never subject to a page set's "public" flag.
+<FilesMatch "^(admin|api)\.php$">
+    <RequireAny>
+        Require ip 203.0.113.0/24
+        <RequireAll>
+            Require shibboleth
+            Require shib-user YOUR_USERNAME
+        </RequireAll>
+    </RequireAny>
+</FilesMatch>
+# No Shibboleth? Delete the RequireAll block above and just keep the
+# Require ip line (or replace both with e.g. "Require valid-user" + Basic
+# Auth, or "Require all granted" if the admin panel doesn't need protecting).
+
+# 3. index.php enforces per-page-set access itself (see access.php); no
+#    directory-wide restriction here so public page sets are reachable.
+
+# 4. Never serve the database or local config directly.
+<FilesMatch "\.(db|db-shm|db-wal)$">
+    Require all denied
+</FilesMatch>
+<Files "config.php">
+    Require all denied
+</Files>
+
+# 5. Pretty URLs: /some-slug -> index.php?set=some-slug for any page set,
+#    without needing a matching physical folder.
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([a-z0-9_-]+)/?$ index.php?set=$1 [L,QSA]

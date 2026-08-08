@@ -15,10 +15,11 @@ function init_schema(): void {
     $pdo = get_db();
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS page_sets (
-            id       INTEGER PRIMARY KEY AUTOINCREMENT,
-            slug     TEXT    NOT NULL UNIQUE,
-            title    TEXT    NOT NULL,
-            position INTEGER NOT NULL DEFAULT 0
+            id        INTEGER PRIMARY KEY AUTOINCREMENT,
+            slug      TEXT    NOT NULL UNIQUE,
+            title     TEXT    NOT NULL,
+            position  INTEGER NOT NULL DEFAULT 0,
+            is_public INTEGER NOT NULL DEFAULT 0
         );
         CREATE TABLE IF NOT EXISTS categories (
             id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,5 +41,10 @@ function init_schema(): void {
     $cols = array_column($pdo->query("PRAGMA table_info(bookmarks)")->fetchAll(), 'name');
     if (!in_array('icon', $cols)) {
         $pdo->exec("ALTER TABLE bookmarks ADD COLUMN icon TEXT DEFAULT NULL");
+    }
+    // Add is_public column to existing databases
+    $psCols = array_column($pdo->query("PRAGMA table_info(page_sets)")->fetchAll(), 'name');
+    if (!in_array('is_public', $psCols)) {
+        $pdo->exec("ALTER TABLE page_sets ADD COLUMN is_public INTEGER NOT NULL DEFAULT 0");
     }
 }

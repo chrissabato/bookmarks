@@ -38,6 +38,10 @@ init_schema();
              class="mt-1 w-full bg-slate-900 border border-slate-700 text-white rounded px-3 py-2 text-sm font-mono focus:outline-none focus:border-slate-500">
       <p class="text-xs text-slate-500 mt-1">Lowercase letters, numbers, hyphens only</p>
     </div>
+    <label class="flex items-center gap-2 text-sm text-slate-300">
+      <input id="new-public" type="checkbox" class="rounded bg-slate-900 border-slate-700">
+      Public (no login required)
+    </label>
     <div class="flex gap-2 justify-end mt-2">
       <button onclick="document.getElementById('new-set-dialog').close()"
               class="px-4 py-1.5 text-sm rounded border border-slate-700 hover:border-slate-500 transition-colors">Cancel</button>
@@ -205,6 +209,18 @@ function renderSetManager() {
         slugBadge.className = 'text-xs text-slate-500 font-mono';
         slugBadge.textContent = ps.slug;
 
+        const publicLabel = document.createElement('label');
+        publicLabel.className = 'flex items-center gap-1 text-xs text-slate-500';
+        const publicCheckbox = document.createElement('input');
+        publicCheckbox.type = 'checkbox';
+        publicCheckbox.className = 'rounded bg-slate-900 border-slate-700';
+        publicCheckbox.checked = !!ps.is_public;
+        publicCheckbox.addEventListener('change', async () => {
+            ps.is_public = publicCheckbox.checked ? 1 : 0;
+            await POST('page_sets.update', { id: ps.id, is_public: publicCheckbox.checked ? '1' : '' });
+        });
+        publicLabel.append(publicCheckbox, 'Public');
+
         const delBtn = document.createElement('button');
         delBtn.className = 'del-btn opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-400 text-sm px-1 transition-colors';
         delBtn.textContent = '✕';
@@ -221,7 +237,7 @@ function renderSetManager() {
             renderSetManager();
         });
 
-        row.append(handle, title, slugBadge, delBtn);
+        row.append(handle, title, slugBadge, publicLabel, delBtn);
         list.appendChild(row);
     });
 
@@ -247,18 +263,20 @@ document.getElementById('new-title').addEventListener('input', function () {
 });
 
 async function createPageSet() {
-    const title = document.getElementById('new-title').value.trim();
-    const slug  = document.getElementById('new-slug').value.trim();
+    const title    = document.getElementById('new-title').value.trim();
+    const slug     = document.getElementById('new-slug').value.trim();
+    const isPublic = document.getElementById('new-public').checked;
     if (!title || !slug) { alert('Title and slug are required.'); return; }
     if (!/^[a-z0-9_-]+$/.test(slug)) { alert('Slug must be lowercase letters, numbers, or hyphens.'); return; }
     try {
-        const ps = await POST('page_sets.create', { title, slug });
+        const ps = await POST('page_sets.create', { title, slug, is_public: isPublic ? '1' : '' });
         state.pageSets.push(ps);
         state.activeId = ps.id;
         state.categories = [];
         document.getElementById('new-set-dialog').close();
         document.getElementById('new-title').value = '';
         document.getElementById('new-slug').value = '';
+        document.getElementById('new-public').checked = false;
         renderTabs();
         renderSetManager();
         renderCategories();

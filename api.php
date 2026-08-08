@@ -57,7 +57,7 @@ try {
 
         case 'page_sets.list':
             echo json_encode($pdo->query(
-                "SELECT id, slug, title, position FROM page_sets ORDER BY position"
+                "SELECT id, slug, title, position, is_public FROM page_sets ORDER BY position"
             )->fetchAll());
             break;
 
@@ -65,11 +65,12 @@ try {
             $slug  = required_post('slug');
             $title = required_post('title');
             if (!preg_match('/^[a-z0-9_-]+$/', $slug)) throw new InvalidArgumentException("Invalid slug");
+            $isPublic = !empty($_POST['is_public']) ? 1 : 0;
             $max = (int)$pdo->query("SELECT COALESCE(MAX(position)+1,0) FROM page_sets")->fetchColumn();
-            $pdo->prepare("INSERT INTO page_sets (slug,title,position) VALUES (?,?,?)")
-                ->execute([$slug, $title, $max]);
+            $pdo->prepare("INSERT INTO page_sets (slug,title,position,is_public) VALUES (?,?,?,?)")
+                ->execute([$slug, $title, $max, $isPublic]);
             $id = (int)$pdo->lastInsertId();
-            echo json_encode(['id' => $id, 'slug' => $slug, 'title' => $title, 'position' => $max]);
+            echo json_encode(['id' => $id, 'slug' => $slug, 'title' => $title, 'position' => $max, 'is_public' => $isPublic]);
             break;
 
         case 'page_sets.update':
@@ -82,6 +83,7 @@ try {
                 $fields[] = 'slug=?';
                 $params[] = $_POST['slug'];
             }
+            if (isset($_POST['is_public'])) { $fields[] = 'is_public=?'; $params[] = $_POST['is_public'] ? 1 : 0; }
             if ($fields) {
                 $params[] = $id;
                 $pdo->prepare("UPDATE page_sets SET " . implode(',', $fields) . " WHERE id=?")->execute($params);
