@@ -18,10 +18,6 @@ if (!empty($_SERVER['HTTP_ORIGIN'])) {
 $action = $_GET['action'] ?? '';
 $method = $_SERVER['REQUEST_METHOD'];
 
-function post(string $key, mixed $default = null): mixed {
-    return $_POST[$key] ?? $default;
-}
-
 function required_post(string $key): string {
     $v = $_POST[$key] ?? null;
     if ($v === null || $v === '') throw new InvalidArgumentException("Missing: $key");

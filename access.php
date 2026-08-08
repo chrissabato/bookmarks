@@ -25,7 +25,7 @@ function check_access(bool $isPublic): void {
 }
 
 function ip_in_range(string $ip, string $cidr): bool {
-    if (!str_contains($cidr, '/')) return $ip === $cidr;
+    if (strpos($cidr, '/') === false) return $ip === $cidr;
     [$subnet, $bits] = explode('/', $cidr, 2);
     $bits = (int)$bits;
     $ipLong     = ip2long($ip);
