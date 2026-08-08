@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . '/db.php';
+require __DIR__ . '/../db.php';
 init_schema();
 
 header('Content-Type: application/json');

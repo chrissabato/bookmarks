@@ -12,20 +12,11 @@ ShibRequestSetting requireSession 0
 # without immediately redirecting to the IDP
 ShibRequestSetting redirectLimit 0
 
-# 2. admin.php and api.php always require your trusted network or
-#    Shibboleth login — they're never subject to a page set's "public" flag.
-<FilesMatch "^(admin|api)\.php$">
-    <RequireAny>
-        Require ip 203.0.113.0/24
-        <RequireAll>
-            Require shibboleth
-            Require shib-user YOUR_USERNAME
-        </RequireAll>
-    </RequireAny>
-</FilesMatch>
-# No Shibboleth? Delete the RequireAll block above and just keep the
-# Require ip line (or replace both with e.g. "Require valid-user" + Basic
-# Auth, or "Require all granted" if the admin panel doesn't need protecting).
+# 2. admin.php and api.php live under admin/ with their own directory-scoped
+#    .htaccess — they're never subject to a page set's "public" flag. See
+#    admin/.htaccess.example. (Shibboleth's requireSession redirect-to-login
+#    doesn't reliably trigger when scoped inside <FilesMatch>, which is why
+#    this isn't handled here with a <FilesMatch> block.)
 
 # 3. index.php enforces per-page-set access itself (see access.php); no
 #    directory-wide restriction here so public page sets are reachable.

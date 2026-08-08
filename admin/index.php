@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . '/db.php';
+require __DIR__ . '/../db.php';
 init_schema();
 ?><!doctype html>
 <html lang="en">
@@ -63,7 +63,7 @@ init_schema();
                 class="text-xs px-3 py-1.5 rounded border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white transition-colors">
           Manage Sets
         </button>
-        <a id="view-link" href="index.php" target="_blank"
+        <a id="view-link" href="../index.php" target="_blank"
            class="text-xs px-3 py-1.5 rounded border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white transition-colors">
           View &rarr;
         </a>
@@ -162,7 +162,7 @@ function renderTabs() {
     // Update view link
     const active = state.pageSets.find(p => p.id === state.activeId);
     const viewLink = document.getElementById('view-link');
-    if (active) viewLink.href = `index.php?set=${encodeURIComponent(active.slug)}`;
+    if (active) viewLink.href = `../index.php?set=${encodeURIComponent(active.slug)}`;
 }
 
 async function switchSet(id) {

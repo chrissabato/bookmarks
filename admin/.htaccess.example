@@ -1,0 +1,24 @@
+# Copy this file to admin/.htaccess and fill in your own values.
+# admin/.htaccess is gitignored so your institution's specific values never
+# get committed.
+#
+# This is directory-scoped on purpose: Shibboleth's requireSession
+# redirect-to-login only reliably triggers at <Directory>/<Location>
+# granularity, not within <Files>/<FilesMatch> in the root .htaccess. That's
+# why admin.php/api.php live under admin/ instead of the project root.
+
+# Remove these three lines if you don't use Shibboleth.
+AuthType shibboleth
+ShibRequestSetting requireSession 1
+ShibRequestSetting redirectLimit 0
+
+<RequireAny>
+    Require ip 203.0.113.0/24
+    <RequireAll>
+        Require shibboleth
+        Require shib-user YOUR_USERNAME
+    </RequireAll>
+</RequireAny>
+# No Shibboleth? Delete the RequireAll block above and just keep the
+# Require ip line (or replace both with e.g. "Require valid-user" + Basic
+# Auth, or "Require all granted" if the admin panel doesn't need protecting).

@@ -19,12 +19,13 @@ A PHP bookmark dashboard, originally built for Willamette University Athletics s
 |------|---------|
 | `db.php` | PDO singleton (`get_db()`) + `init_schema()` — included by all other PHP files |
 | `access.php` | `check_access(bool $isPublic)` — viewer-side gate for non-public page sets, reads `config.php` |
-| `api.php` | JSON API for admin — all CRUD and reorder operations via `?action=` |
 | `index.php` | Public viewer — reads DB, renders card grid, live search |
-| `admin.php` | Admin SPA shell — all JS state management, no page reloads |
+| `admin/index.php` | Admin SPA shell — all JS state management, no page reloads |
+| `admin/api.php` | JSON API for admin — all CRUD and reorder operations via `?action=` |
+| `admin/.htaccess` | Gitignored — restricts `admin/` to trusted IP/Shibboleth. Copy from `admin/.htaccess.example` |
 | `bookmarks.db` | SQLite database (blocked from direct HTTP access via `.htaccess`) |
 | `config.php` | Gitignored — trusted IP ranges / Shibboleth usernames for restricted page sets. Copy from `config.example.php` |
-| `.htaccess` | Gitignored — real Apache/Shibboleth rules. Copy from `.htaccess.example` |
+| `.htaccess` | Gitignored — real Apache/Shibboleth rules for the root (pretty URLs, file blocking). Copy from `.htaccess.example` |
 | `migrate.php` | One-time JSON→SQLite migration (keep as reference; do not re-run against live DB) |
 
 ## Database Schema
@@ -37,7 +38,7 @@ bookmarks  (id, category_id FK→categories, label, url, position, icon)
 
 All three tables use `position INTEGER` for ordering. Deletes cascade. `bookmarks.db` lives in the project root; the `.htaccess` `<Files>` block denies direct HTTP access to it.
 
-## API (`api.php`)
+## API (`admin/api.php`)
 
 Actions are passed as `?action=<entity>.<verb>`. GET for list operations, POST for all writes.
 
@@ -69,10 +70,10 @@ Reorder operations accept a complete ordered `ids` JSON array and rewrite all `p
 
 Two layers, both configured via gitignored files (copy from the `.example` templates):
 
-- **`admin.php` / `api.php`** — always restricted at the Apache level via a `<FilesMatch>` block in `.htaccess` (campus IP range or Shibboleth user). Never affected by a page set's `is_public` flag.
+- **`admin/`** — always restricted at the Apache level via `admin/.htaccess`, a *directory-scoped* file (campus IP range or Shibboleth user). Never affected by a page set's `is_public` flag. `admin.php`/`api.php` live in their own subdirectory specifically so this can be directory-scoped rather than `<FilesMatch>`-scoped in the root `.htaccess` — Shibboleth's `requireSession` redirect-to-login does not reliably trigger when scoped inside `<Files>`/`<FilesMatch>`, only at `<Directory>`/`<Location>` granularity (and `<Location>` isn't allowed in `.htaccess` at all). Learned this the hard way: a `<FilesMatch>`-scoped `requireSession 1` produced a bare 401 instead of an IdP redirect.
 - **`index.php`** — no blanket Apache restriction; each page set's `is_public` column decides access. Non-public sets are checked in PHP by `access.php`, which reads trusted IP ranges / allowed Shibboleth usernames from `config.php`.
 
-For a fresh self-hosted install: `cp .htaccess.example .htaccess` and `cp config.example.php config.php`, then fill in your own IP range/Shibboleth username (or leave both empty and mark every page set public).
+For a fresh self-hosted install: `cp .htaccess.example .htaccess`, `cp admin/.htaccess.example admin/.htaccess`, and `cp config.example.php config.php`, then fill in your own IP range/Shibboleth username (or leave both empty and mark every page set public).
 
 ## Special link types (preserved from original data)
 
