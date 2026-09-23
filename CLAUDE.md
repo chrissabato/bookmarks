@@ -57,6 +57,7 @@ Reorder operations accept a complete ordered `ids` JSON array and rewrite all `p
 - Cross-category drag: SortableJS `group:'bookmarks'`; fires `bookmarks.move` then `bookmarks.reorder`
 - Page set manager: collapsible panel under "Manage Sets" button; SortableJS reorder + `contenteditable` rename + delete + per-row "Public" checkbox (`is_public`, wired to `page_sets.update`)
 - New Page Set dialog also has a "Public" checkbox, passed to `page_sets.create`
+- "Config" button toggles a read-only panel, rendered server-side in PHP, showing `config.php`'s trusted IP ranges and Shibboleth users, plus the viewer's own IP/`REMOTE_USER` and whether they match. Editing still happens in `config.php` on the server
 
 ## Viewer behavior
 

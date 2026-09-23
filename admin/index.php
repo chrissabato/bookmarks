@@ -1,6 +1,17 @@
 <?php
 require __DIR__ . '/../db.php';
+require __DIR__ . '/../access.php';
 init_schema();
+
+// Read-only snapshot of config.php for the Config panel (mirrors check_access()).
+$configFile = __DIR__ . '/../config.php';
+$hasConfig  = file_exists($configFile);
+$config     = $hasConfig ? require $configFile : [];
+$ipRanges   = $config['trusted_ip_ranges'] ?? [];
+$shibUsers  = $config['shibboleth_users'] ?? [];
+$remoteIp   = $_SERVER['REMOTE_ADDR'] ?? '';
+$remoteUser = $_SERVER['REMOTE_USER'] ?? $_SERVER['eppn'] ?? '';
+function h($s): string { return htmlspecialchars((string)$s, ENT_QUOTES); }
 ?><!doctype html>
 <html lang="en">
 <head>
@@ -63,6 +74,10 @@ init_schema();
                 class="text-xs px-3 py-1.5 rounded border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white transition-colors">
           Manage Sets
         </button>
+        <button onclick="document.getElementById('config-panel').classList.toggle('hidden')"
+                class="text-xs px-3 py-1.5 rounded border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white transition-colors">
+          Config
+        </button>
         <a id="view-link" href="../index.php" target="_blank"
            class="text-xs px-3 py-1.5 rounded border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white transition-colors">
           View &rarr;
@@ -83,6 +98,60 @@ init_schema();
       </button>
     </div>
     <div id="set-list" class="flex flex-col gap-1"></div>
+  </div>
+
+  <!-- Config panel (collapsible, read-only view of config.php) -->
+  <div id="config-panel" class="hidden bg-slate-800 border border-slate-700 rounded-lg mb-4 p-4 text-sm">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Access Config</span>
+      <span class="text-xs text-slate-500">Read-only &middot; edit <code class="font-mono">config.php</code> on the server</span>
+    </div>
+    <?php if (!$hasConfig): ?>
+      <p class="text-amber-400">
+        <code class="font-mono">config.php</code> not found &mdash; non-public page sets deny everyone (no login offered).
+        Copy <code class="font-mono">config.example.php</code> to set it up.
+      </p>
+    <?php else: ?>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div>
+          <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Trusted IP ranges</div>
+          <?php if ($ipRanges): ?>
+            <ul class="font-mono text-slate-200 flex flex-col gap-0.5">
+              <?php foreach ($ipRanges as $range): ?>
+                <li><?= h($range) ?></li>
+              <?php endforeach; ?>
+            </ul>
+          <?php else: ?>
+            <p class="text-slate-500 italic">None &mdash; IP-based access disabled</p>
+          <?php endif; ?>
+        </div>
+        <div>
+          <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Shibboleth users</div>
+          <?php if ($shibUsers): ?>
+            <ul class="font-mono text-slate-200 flex flex-col gap-0.5">
+              <?php foreach ($shibUsers as $user): ?>
+                <li><?= h($user) ?></li>
+              <?php endforeach; ?>
+            </ul>
+          <?php else: ?>
+            <p class="text-slate-500 italic">Empty &mdash; any authenticated Shibboleth user</p>
+          <?php endif; ?>
+        </div>
+      </div>
+    <?php endif; ?>
+    <?php
+      $ipMatch = false;
+      foreach ($ipRanges as $range) { if (ip_in_range($remoteIp, $range)) { $ipMatch = true; break; } }
+      $userMatch = $remoteUser !== '' && (!$shibUsers || in_array($remoteUser, $shibUsers, true));
+    ?>
+    <div class="mt-4 pt-3 border-t border-slate-700 text-xs text-slate-400 flex flex-wrap gap-x-6 gap-y-1">
+      <span>Your IP: <span class="font-mono text-slate-200"><?= h($remoteIp ?: '—') ?></span>
+        <?php if ($ipRanges): ?><span class="<?= $ipMatch ? 'text-emerald-400' : 'text-slate-500' ?>">(<?= $ipMatch ? 'trusted' : 'not in range' ?>)</span><?php endif; ?>
+      </span>
+      <span>Your Shibboleth user: <span class="font-mono text-slate-200"><?= h($remoteUser ?: '—') ?></span>
+        <?php if ($hasConfig && $remoteUser !== ''): ?><span class="<?= $userMatch ? 'text-emerald-400' : 'text-slate-500' ?>">(<?= $userMatch ? 'allowed' : 'not allowed' ?>)</span><?php endif; ?>
+      </span>
+    </div>
   </div>
 
   <!-- Category area -->
